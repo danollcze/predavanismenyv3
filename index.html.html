@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Inventec Nástroj</title>
+  <style>
+    :root {
+      --red: #e60012;
+      --light: #f5f5f5;
+      --dark: #121212;
+      --text-light: #f0f0f0;
+      --input-dark: #1e1e1e;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin:0; font-family:Arial,sans-serif; background:#fff; color:#333; transition: background .3s, color .3s; }
+    body.dark { background:var(--dark); color:var(--text-light); }
+    header { display:flex; align-items:center; padding:10px 20px; background:var(--light); border-bottom:3px solid var(--red); }
+    .logo { background:var(--red); color:#fff; padding:4px 12px; border-radius:4px; font-weight:bold; margin-right:12px; }
+    header h1 { margin:0; color:var(--red); font-size:1.5rem; }
+    .dark-toggle {
+      margin-left:auto; padding:6px 12px; background:var(--red); color:#fff;
+      border:2px solid var(--red); border-radius:4px; cursor:pointer;
+      transition: background .3s, color .3s, border-color .3s;
+    }
+    body.dark .dark-toggle {
+      background:#fff; color:var(--red); border-color:#fff;
+    }
+    .nav { display:flex; justify-content:center; gap:10px; padding:10px; }
+    .nav button {
+      padding:10px 20px; background:var(--red); color:#fff;
+      border:none; border-radius:4px; cursor:pointer;
+      transition: background .3s;
+    }
+    .nav button.active { background:#b0000e; }
+    .section { display:none; max-width:800px; margin:20px auto; padding:20px; }
+    .section.active { display:block; }
+    label { display:block; margin-bottom:10px; }
+    input, select, textarea {
+      width:100%; padding:8px; margin-top:5px;
+      border:1px solid #ccc; border-radius:4px;
+      transition: background .3s, color .3s, border-color .3s;
+    }
+    body.dark input, body.dark select, body.dark textarea {
+      background:var(--input-dark); color:#fff; border-color:#444;
+    }
+    textarea { resize:vertical; }
+    .buttons { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
+    .buttons button {
+      flex:1; padding:10px; background:var(--red); color:#fff;
+      border:none; border-radius:4px; cursor:pointer;
+    }
+    ul#seznam, ul#historyList { list-style:none; padding:0; margin-top:10px; }
+    ul#seznam li {
+      margin-bottom:5px;
+      white-space: normal;
+      overflow-wrap: break-word;
+    }
+    ul#historyList {
+      max-height:200px; overflow:auto;
+      border:1px solid #ccc; border-radius:4px;
+      background:#fff;
+    }
+    ul#historyList li {
+      padding:8px; border-bottom:1px solid #eee; cursor:pointer;
+      white-space: normal; overflow-wrap: break-word;
+    }
+    ul#historyList li:hover, ul#historyList li.selected { background:#f0f0f0; }
+    body.dark ul#historyList { background:var(--input-dark); border-color:#444; }
+    body.dark ul#historyList li {
+      background:var(--input-dark); color:var(--text-light);
+      border-bottom-color:#333;
+    }
+    body.dark ul#historyList li:hover, body.dark ul#historyList li.selected {
+      background:#333;
+    }
+    #recordDetail {
+      margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:4px;
+      background:#fafafa; white-space: pre-wrap; overflow-wrap: break-word;
+      max-height:200px; overflow-y:auto;
+    }
+    body.dark #recordDetail {
+      background:var(--input-dark); color:var(--text-light);
+      border-color:#444;
+    }
+    /* Grafy */
+    #sectionCharts .charts-wrapper {
+      display:flex; gap:20px; flex-wrap:wrap;
+    }
+    #sectionCharts .charts-wrapper > div {
+      flex:1 1 0; min-width:300px;
+    }
+    .chart-container {
+      position:relative; width:100%; height:400px; margin-bottom:20px;
+    }
+    canvas { display:block; }
+    @media(max-width:600px){
+      .nav, .buttons { flex-direction:column; }
+      .nav button, .buttons button { width:100%; }
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <header>
+    <div class="logo">INVENTEC</div>
+    <h1>PCA Technik</h1>
+    <button id="darkToggle" class="dark-toggle">🌙 Tmavý režim</button>
+  </header>
+
+  <div class="nav">
+    <button id="btnSummary" class="active">Souhrn</button>
+    <button id="btnHandover">Předání</button>
+    <button id="btnHistory">Historie</button>
+    <button id="btnCharts">Grafy</button>
+  </div>
+
+  <!-- Souhrn -->
+  <div id="sectionSummary" class="section active">
+    <h2>Souhrn událostí</h2>
+    <form id="summaryForm">
+      <label>Datum:<input type="date" id="datum" required></label>
+      <label>Linka:
+        <select id="linka" required>
+          <option value="">Vyberte</option>
+          <option>Linka A</option>
+          <option>Linka B</option>
+          <option>Linka 1</option>
+          <option>Linka 2</option>
+        </select>
+      </label>
+      <label>Typ:
+        <select id="typ" required>
+          <option value="">Vyberte</option>
+          <option>Mechanická porucha</option>
+          <option>Elektrická porucha</option>
+          <option>Údržba</option>
+          <option>Jiné</option>
+        </select>
+      </label>
+      <label id="otherWrapper" style="display:none;">
+        Upřesnění:<input type="text" id="other">
+      </label>
+      <label>Popis události:<textarea id="note" rows="2" required></textarea></label>
+      <label>Jméno:<input type="text" id="name" required></label>
+    </form>
+    <div class="buttons">
+      <button id="addBtn">Přidat</button>
+      <button id="sendBtn">Odeslat</button>
+      <button id="clearBtn">Smazat</button>
+    </div>
+    <ul id="seznam"></ul>
+  </div>
+
+  <!-- Předání -->
+  <div id="sectionHandover" class="section">
+    <h2>Předávání směny</h2>
+    <form id="handoverForm">
+      <label>Typ DS:
+        <select id="dsType">
+          <option>DS1</option>
+          <option selected>DS2</option>
+        </select>
+      </label>
+      <label>Datum:<input type="date" id="hDate" required></label>
+      <label>Lokace:
+        <select id="loc">
+          <option>Slatina</option>
+          <option>Blucina</option>
+        </select>
+      </label>
+      <label id="l1">Událost – Linka 1 Slatina:<textarea id="h1" rows="2" required></textarea></label>
+      <label id="l2">Událost – Linka 2 Slatina:<textarea id="h2" rows="2" required></textarea></label>
+      <label>Poznámky:<textarea id="hNote" rows="2" required></textarea></label>
+      <label>Jméno:<input type="text" id="hName" required></label>
+    </form>
+    <div class="buttons">
+      <button id="hEmailBtn">Email</button>
+      <button id="hTeamsBtn">Teams</button>
+      <button id="hClearBtn">Smazat</button>
+    </div>
+  </div>
+
+  <!-- Historie -->
+  <div id="sectionHistory" class="section">
+    <h2>Historie</h2>
+    <label>Hledat:<input id="search" type="text"></label>
+    <div class="buttons">
+      <button id="exportBtn">Export CSV</button>
+      <button id="histClearBtn">Vymazat historii</button>
+    </div>
+    <ul id="historyList"></ul>
+    <div id="recordDetail">Vyber záznam...</div>
+  </div>
+
+  <!-- Grafy -->
+  <div id="sectionCharts" class="section">
+    <h2>Grafy</h2>
+    <div class="charts-wrapper">
+      <div>
+        <h3>Podle typu události</h3>
+        <div class="chart-container"><canvas id="typeChart"></canvas></div>
+      </div>
+      <div>
+        <h3>Podle linky</h3>
+        <div class="chart-container"><canvas id="lineChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const KEY_SUM  = 'summaryRecords';
+      const KEY_HIST = 'historyRecords';
+
+      const loadSum  = () => JSON.parse(localStorage.getItem(KEY_SUM)  || '[]');
+      const saveSum  = arr => localStorage.setItem(KEY_SUM,  JSON.stringify(arr));
+      const loadHist = () => JSON.parse(localStorage.getItem(KEY_HIST) || '[]');
+      const saveHist = arr => localStorage.setItem(KEY_HIST, JSON.stringify(arr));
+
+      // Tmavý režim
+      const darkToggle = document.getElementById('darkToggle');
+      if (localStorage.getItem('darkMode') === 'true') {
+        document.body.classList.add('dark');
+        darkToggle.textContent = '☀️ Světlý režim';
+      }
+      darkToggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark');
+        const dm = document.body.classList.contains('dark');
+        darkToggle.textContent = dm ? '☀️ Světlý režim' : '🌙 Tmavý režim';
+        localStorage.setItem('darkMode', dm);
+      });
+
+      // Přepínání sekcí
+      ['Summary','Handover','History','Charts'].forEach(tab => {
+        document.getElementById('btn'+tab).addEventListener('click', () => {
+          document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+          document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+          document.getElementById('section'+tab).classList.add('active');
+          document.getElementById('btn'+tab).classList.add('active');
+          localStorage.setItem('activeTab', tab);
+          if (tab === 'Charts') renderChart();
+        });
+      });
+      const savedTab = localStorage.getItem('activeTab') || 'Summary';
+      document.getElementById('btn'+savedTab).click();
+
+      // Předvyplnit datum
+      document.getElementById('datum').valueAsDate = new Date();
+      document.getElementById('hDate').valueAsDate  = new Date();
+
+      // Souhrn – Jiné…
+      document.getElementById('typ').addEventListener('change', e => {
+        document.getElementById('otherWrapper').style.display = e.target.value === 'Jiné' ? 'block' : 'none';
+      });
+
+      // Přidat Souhrn
+      document.getElementById('addBtn').addEventListener('click', () => {
+        const d = document.getElementById('datum').value;
+        const l = document.getElementById('linka').value;
+        let t = document.getElementById('typ').value;
+        if (t === 'Jiné') t = document.getElementById('other').value.trim();
+        const p = document.getElementById('note').value;
+        const n = document.getElementById('name').value;
+        if (!d||!l||!t||!p||!n) return alert('Vyplňte všechna pole.');
+        const rec = { datum:d, linka:l, typUdalosti:t, poznamka:p, jmeno:n };
+        const sumArr = loadSum(); sumArr.push(rec); saveSum(sumArr); renderSummary();
+        const histArr = loadHist(); histArr.push(rec); saveHist(histArr); renderHistory();
+        if (document.getElementById('sectionCharts').classList.contains('active')) renderChart();
+        document.getElementById('summaryForm').reset();
+        document.getElementById('datum').valueAsDate = new Date();
+        document.getElementById('otherWrapper').style.display = 'none';
+      });
+
+      function renderSummary() {
+        const ul = document.getElementById('seznam');
+        ul.innerHTML = '';
+        loadSum().forEach(r => {
+          const li = document.createElement('li');
+          li.textContent = `${r.datum} | ${r.linka} | ${r.typUdalosti} | ${r.poznamka}`;
+          ul.appendChild(li);
+        });
+      }
+      renderSummary();
+
+      // Odeslat Souhrn
+      document.getElementById('sendBtn').addEventListener('click', () => {
+        const arr = loadSum(); if (!arr.length) return alert('Žádné záznamy.');
+        const body = arr.map(r => `${r.datum} | ${r.linka} | ${r.typUdalosti} | ${r.poznamka} | ${r.jmeno}`)
+                        .join('\n');
+        window.location.href = `mailto:hylak.kamil@inventec.com,klco.roman@inventec.com,cech.adam@inventec.com,janas.jan@inventec.com,brablec.pavel@inventec.com,postraneckych.danny@inventec.com,teryngel.frantisek@inventec.com,holeksa.robert@inventec.com?subject=${encodeURIComponent('Souhrn událostí DS2')}&body=${encodeURIComponent(body)}`;
+      });
+
+      // Smazat Souhrn
+      document.getElementById('clearBtn').addEventListener('click', () => {
+        localStorage.removeItem(KEY_SUM);
+        renderSummary();
+      });
+
+      // Předání – popisky
+      document.getElementById('loc').addEventListener('change', () => {
+        const v = document.getElementById('loc').value;
+        document.getElementById('l1').firstChild.textContent = v==='Slatina'
+          ? 'Událost – Linka 1 Slatina:' : 'Událost – Linka A Blucina:';
+        document.getElementById('l2').firstChild.textContent = v==='Slatina'
+          ? 'Událost – Linka 2 Slatina:' : 'Událost – Linka B Blucina:';
+      });
+
+      // Předání – email
+      document.getElementById('hEmailBtn').addEventListener('click', () => {
+        const d  = document.getElementById('hDate').value.split('-').reverse().join('.');
+        const ds = document.getElementById('dsType').value;
+        const loc= document.getElementById('loc').value;
+        const l1 = document.getElementById('h1').value;
+        const l2 = document.getElementById('h2').value;
+        const p  = document.getElementById('hNote').value;
+        const n  = document.getElementById('hName').value;
+        if (!d||!l1||!l2||!p||!n) return alert('Vyplňte všechna pole.');
+        const html = `<p>📋<strong>${ds} ${loc} – ${d}</strong></p><p>• Linka 1: ${l1}</p><p>• Linka 2: ${l2}</p><p>• Poznámky: ${p}</p><p><em>${n}</em></p>`;
+        window.location.href = `mailto:hylak.kamil@inventec.com,klco.roman@inventec.com,cech.adam@inventec.com,janas.jan@inventec.com,brablec.pavel@inventec.com,postraneckych.danny@inventec.com,teryngel.frantisek@inventec.com,holeksa.robert@inventec.com?subject=${encodeURIComponent('Předání směny '+ds)}&body=${encodeURIComponent(html)}`;
+      });
+
+      // Předání – Teams placeholder
+      document.getElementById('hTeamsBtn').addEventListener('click', () => alert('Odeslat do Teams…'));
+
+      // Předání – smazat
+      document.getElementById('hClearBtn').addEventListener('click', () => {
+        document.getElementById('handoverForm').reset();
+        document.getElementById('hDate').valueAsDate = new Date();
+      });
+
+      // Historie – render/filter/detail
+      function renderHistory() {
+        const arr = loadHist();
+        const f   = document.getElementById('search').value.toLowerCase();
+        const ul  = document.getElementById('historyList');
+        ul.innerHTML = '';
+        arr.filter(r =>
+          r.datum.includes(f) ||
+          r.linka.toLowerCase().includes(f) ||
+          r.typUdalosti.toLowerCase().includes(f) ||
+          r.poznamka.toLowerCase().includes(f) ||
+          r.jmeno.toLowerCase().includes(f)
+        ).forEach((r,i) => {
+          const li = document.createElement('li');
+          li.textContent = `${r.datum} | ${r.linka} | ${r.typUdalosti} | ${r.jmeno}`;
+          li.addEventListener('click', () => {
+            document.querySelectorAll('#historyList li').forEach((el,j) =>	el.classList.toggle('selected', j===i));  
+            document.getElementById('recordDetail').innerHTML =
+              `<strong>Datum:</strong> ${r.datum}<br>` +
+              `<strong>Linka:</strong> ${r.linka}<br>` +
+              `<strong>Typ události:</strong> ${r.typUdalosti}<br>` +
+              `<strong>Poznámka:</strong> ${r.poznamka}<br>` +
+              `<strong>Jméno:</strong> ${r.jmeno}`;
+          });
+          ul.appendChild(li);
+        });
+      }
+      renderHistory();
+      document.getElementById('search').addEventListener('input', renderHistory);
+
+      // Export CSV
+   document.getElementById('exportBtn').addEventListener('click', () => {
+  const arr = loadHist();
+  if (!arr.length) return alert('Žádné záznamy k exportu.');
+
+  const bom = '\uFEFF';
+  let csv = bom + 'Datum;Linka;Typ události;Popis události;Operátor\r\n';
+
+  arr.forEach(r => {
+    // pokud r.poznamka neexistuje, použijeme prázdný string
+    const rawNote = r.poznamka || '';
+    const note = rawNote
+      .replace(/"/g, '""')
+      .replace(/\r?\n/g, ' ');
+    csv += [
+      r.datum || '',
+      r.linka || '',
+      r.typUdalosti || '',
+      `"${note}"`,
+      r.jmeno || ''
+    ].join(';') + '\r\n';
+  });
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = 'historie.csv';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+
+      // Vymazat historii
+      document.getElementById('histClearBtn').addEventListener('click', () => {
+        if (!confirm('Opravdu vymazat historii?')) return;
+        localStorage.removeItem(KEY_HIST);
+        renderHistory();
+        document.getElementById('recordDetail').textContent = 'Vyber záznam...';
+      });
+
+      // Grafy
+      function renderChart() {
+        const data = loadHist();
+
+        const byType = data.reduce((acc,r) => {
+          acc[r.typUdalosti] = (acc[r.typUdalosti]||0) + 1;
+          return acc;
+        }, {});
+        const ctx1 = document.getElementById('typeChart').getContext('2d');
+        new Chart(ctx1, {
+          type: 'bar',
+          data: {
+            labels: Object.keys(byType),
+            datasets: [{ label: 'Počet událostí', data: Object.values(byType) }]
+          },
+          options: { maintainAspectRatio:false, scales:{ y:{ beginAtZero:true } } }
+        });
+
+        const byLine = data.reduce((acc,r) => {
+          acc[r.linka] = (acc[r.linka]||0) + 1;
+          return acc;
+        }, {});
+        const ctx2 = document.getElementById('lineChart').getContext('2d');
+        new Chart(ctx2, {
+          type: 'bar',
+          data: {
+            labels: Object.keys(byLine),
+            datasets: [{ label: 'Počet událostí', data: Object.values(byLine) }]
+          },
+          options: { maintainAspectRatio:false, scales:{ y:{ beginAtZero:true } } }
+        });
+      }
+    });
+  </script>
+</body>
+</html>
