@@ -172,7 +172,16 @@
       <label id="l1">Událost – Linka 1 Slatina:<textarea id="h1" rows="2" required></textarea></label>
       <label id="l2">Událost – Linka 2 Slatina:<textarea id="h2" rows="2" required></textarea></label>
       <label>Poznámky:<textarea id="hNote" rows="2" required></textarea></label>
-      <label>Jméno:<input type="text" id="hName" required></label>
+      <label>Jméno:
+  <select id="hName" required>
+    <option value="" disabled selected>Vyber jméno</option>
+    <option>Jana Nováková</option>
+    <option>Tomáš Dvořák</option>
+    <option>Lucie Malá</option>
+    <option>Martin Horák</option>
+    <option>Eva Benešová</option>
+  </select>
+</label>
     </form>
     <div class="buttons">
       <button id="hEmailBtn">Email</button>
