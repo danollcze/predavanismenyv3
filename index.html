@@ -116,43 +116,48 @@
   </div>
 
   <!-- Souhrn -->
-  <div id="sectionSummary" class="section active">
-    <h2>Souhrn událostí</h2>
-    <form id="summaryForm">
-      <label>Datum:<input type="date" id="datum" required></label>
-      <label>Linka:
-        <select id="linka" required>
-          <option value="">Vyberte</option>
-          <option>Linka A</option>
-          <option>Linka B</option>
-          <option>Linka 1</option>
-          <option>Linka 2</option>
-        </select>
-      </label>
-      <label>Typ:
-        <select id="typ" required>
-          <option value="">Vyberte</option>
-          <option>Mechanická porucha</option>
-          <option>Elektrická porucha</option>
-          <option>Údržba</option>
-          <option>Jiné</option>
-        </select>
-      </label>
-      <label id="otherWrapper" style="display:none;">
-        Upřesnění:<input type="text" id="other">
-      </label>
-      <label>Popis události:<textarea id="note" rows="2" required></textarea></label>
-      <label>Jméno:
-  <select id="hName" required>
-    <option value="" disabled selected>Vyber jméno</option>
-    <option>Jana Nováková</option>
-    <option>Tomáš Dvořák</option>
-    <option>Lucie Malá</option>
-    <option>Martin Horák</option>
-    <option>Eva Benešová</option>
-  </select>
-</label>
-    </form>
+  <form id="summaryForm">
+  <label>Typ DS:
+    <select id="dsTypeSummary" required>
+      <option value="" disabled selected>Vyber DS</option>
+      <option>DS1</option>
+      <option>DS2</option>
+    </select>
+  </label>
+  <label>Datum:<input type="date" id="datum" required></label>
+  <label>Linka:
+    <select id="linka" required>
+      <option value="">Vyberte</option>
+      <option>Linka A</option>
+      <option>Linka B</option>
+      <option>Linka 1</option>
+      <option>Linka 2</option>
+    </select>
+  </label>
+  <label>Typ:
+    <select id="typ" required>
+      <option value="">Vyberte</option>
+      <option>Mechanická porucha</option>
+      <option>Elektrická porucha</option>
+      <option>Údržba</option>
+      <option>Jiné</option>
+    </select>
+  </label>
+  <label id="otherWrapper" style="display:none;">
+    Upřesnění:<input type="text" id="other">
+  </label>
+  <label>Popis události:<textarea id="note" rows="2" required></textarea></label>
+  <label>Jméno:
+    <select id="hName" required>
+      <option value="" disabled selected>Vyber jméno</option>
+      <option>Jana Nováková</option>
+      <option>Tomáš Dvořák</option>
+      <option>Lucie Malá</option>
+      <option>Martin Horák</option>
+      <option>Eva Benešová</option>
+    </select>
+  </label>
+</form>
     <div class="buttons">
       <button id="addBtn">Přidat</button>
       <button id="sendBtn">Odeslat</button>
