@@ -380,12 +380,20 @@
     return alert('Vyplňte všechna pole.');
   }
 
+  // Rozlišení názvu linek podle lokace
+  let label1 = 'Linka 1';
+  let label2 = 'Linka 2';
+  if (loc.toLowerCase() === 'blucina' || loc.toLowerCase() === 'blučína') {
+    label1 = 'Linka A';
+    label2 = 'Linka B';
+  }
+
   const subject = `Předání směny ${ds} - ${loc}`;
   const body = 
 `📋 Předání směny – ${ds} ${loc}, ${d}
 
-• Linka 1: ${l1}
-• Linka 2: ${l2}
+• ${label1}: ${l1}
+• ${label2}: ${l2}
 • Poznámky: ${p}
 
 Předává: ${n}
@@ -404,6 +412,7 @@ Pro: ${loc}`;
 
   window.location.href = `mailto:${emailTo}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 });
+
 
       // Předání – Teams placeholder
       document.getElementById('hTeamsBtn').addEventListener('click', () => alert('Odeslat do Teams…'));
