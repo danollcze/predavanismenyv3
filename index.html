@@ -367,17 +367,43 @@
 
       // Předání – email
       document.getElementById('hEmailBtn').addEventListener('click', () => {
-        const d  = document.getElementById('hDate').value.split('-').reverse().join('.');
-        const ds = document.getElementById('dsType').value;
-        const loc= document.getElementById('loc').value;
-        const l1 = document.getElementById('h1').value;
-        const l2 = document.getElementById('h2').value;
-        const p  = document.getElementById('hNote').value;
-        const n  = document.getElementById('hName').value;
-        if (!d||!l1||!l2||!p||!n) return alert('Vyplňte všechna pole.');
-        const html = `<p>📋<strong>${ds} ${loc} – ${d}</strong></p><p>• Linka 1: ${l1}</p><p>• Linka 2: ${l2}</p><p>• Poznámky: ${p}</p><p><em>${n}</em></p>`;
-        window.location.href = `mailto:hylak.kamil@inventec.com,klco.roman@inventec.com,cech.adam@inventec.com,janas.jan@inventec.com,brablec.pavel@inventec.com,postraneckych.danny@inventec.com,teryngel.frantisek@inventec.com,holeksa.robert@inventec.com?subject=${encodeURIComponent('Předání směny '+ds)}&body=${encodeURIComponent(html)}`;
-      });
+  const dRaw = document.getElementById('hDate').value;
+  const d = dRaw ? dRaw.split('-').reverse().join('.') : '';
+  const ds = document.getElementById('dsType').value;
+  const loc = document.getElementById('loc').value;
+  const l1 = document.getElementById('h1').value.trim();
+  const l2 = document.getElementById('h2').value.trim();
+  const p = document.getElementById('hNote').value.trim();
+  const n = document.getElementById('hName').value.trim();
+
+  if (!d || !l1 || !l2 || !p || !n) {
+    return alert('Vyplňte všechna pole.');
+  }
+
+  const subject = `Předání směny ${ds} - ${loc}`;
+  const body = 
+`📋 Předání směny – ${ds} ${loc}, ${d}
+
+• Linka 1: ${l1}
+• Linka 2: ${l2}
+• Poznámky: ${p}
+
+Předává: ${n}
+Pro: ${loc}`;
+
+  const emailTo = [
+    "hylak.kamil@inventec.com",
+    "klco.roman@inventec.com",
+    "cech.adam@inventec.com",
+    "janas.jan@inventec.com",
+    "brablec.pavel@inventec.com",
+    "postraneckych.danny@inventec.com",
+    "teryngel.frantisek@inventec.com",
+    "holeksa.robert@inventec.com"
+  ].join(";");
+
+  window.location.href = `mailto:${emailTo}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+});
 
       // Předání – Teams placeholder
       document.getElementById('hTeamsBtn').addEventListener('click', () => alert('Odeslat do Teams…'));
