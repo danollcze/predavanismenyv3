@@ -1,0 +1,36 @@
+[
+    {
+        "title": "Syrnica",
+        "image": "",
+        "cookingTime": "40",
+        "portionCount": "1",
+        "ingredients": [
+            "1\/4 l vody",
+            "3\/4 l ml\u00e9ka ",
+            "3 dkg m\u00e1sla ",
+            "2 olomouck\u00e9 tvar\u016f\u017eky ",
+            "1\/4 kg star\u0161\u00edho tvarohu",
+            "s\u016fl ",
+            "km\u00edn"
+        ],
+        "steps": [
+            "Pova\u0159\u00edme: ml\u00e9ko s vodou, s\u016fl, kmin, pokr\u00e1jen\u00e9 tvar\u016f\u017eky ......."
+        ]
+    },
+    {
+        "title": "Syrnica",
+        "image": "",
+        "ingredients": [
+            "1\/4 l vody",
+            "3\/4 l ml\u00e9ka ",
+            "3 dkg m\u00e1sla ",
+            "2 olomouck\u00e9 tvar\u016f\u017eky ",
+            "1\/4 kg star\u0161\u00edho tvarohu",
+            "s\u016fl ",
+            "km\u00edn"
+        ],
+        "steps": [
+            "Pova\u0159\u00edme: ml\u00e9ko s vodou, s\u016fl, kmin, pokr\u00e1jen\u00e9 tvar\u016f\u017eky ....... Xxxxxxxxxx"
+        ]
+    }
+]

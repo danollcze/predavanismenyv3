@@ -1,533 +1,654 @@
 <!DOCTYPE html>
 <html lang="cs">
+
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Inventec Nástroj</title>
+  <meta charset="UTF-8">
+  <title>Můj Receptář</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <style>
-    :root {
-      --red: #e60012;
-      --light: #f5f5f5;
-      --dark: #121212;
-      --text-light: #f0f0f0;
-      --input-dark: #1e1e1e;
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f9f9f9;
+      color: #222;
+      margin: 0;
     }
-    *, *::before, *::after { box-sizing: border-box; }
-    body { margin:0; font-family:Arial,sans-serif; background:#fff; color:#333; transition: background .3s, color .3s; }
-    body.dark { background:var(--dark); color:var(--text-light); }
-    header { display:flex; align-items:center; padding:10px 20px; background:var(--light); border-bottom:3px solid var(--red); }
-    .logo { background:var(--red); color:#fff; padding:4px 12px; border-radius:4px; font-weight:bold; margin-right:12px; }
-    header h1 { margin:0; color:var(--red); font-size:1.5rem; }
-    .dark-toggle {
-      margin-left:auto; padding:6px 12px; background:var(--red); color:#fff;
-      border:2px solid var(--red); border-radius:4px; cursor:pointer;
-      transition: background .3s, color .3s, border-color .3s;
+
+    .nav {
+      background: #00ff15;
+      color: #fff;
+      font-size: 2rem;
+      font-weight: bold;
+      text-align: center;
+      padding: 1.2rem 0;
+      letter-spacing: 1px;
+      position: sticky;
+      top: 0;
+      z-index: 20;
     }
-    body.dark .dark-toggle {
-      background:#fff; color:var(--red); border-color:#fff;
+
+    main {
+      max-width: 900px;
+      margin: 2rem auto 1rem auto;
     }
-    .nav { display:flex; justify-content:center; gap:10px; padding:10px; }
-    .nav button {
-      padding:10px 20px; background:var(--red); color:#fff;
-      border:none; border-radius:4px; cursor:pointer;
-      transition: background .3s;
+
+    .add-recipe,
+    .filter-recipes {
+      background: #fff;
+      padding: 2rem 1.5rem;
+      border-radius: 1rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 16px #0001;
     }
-    .nav button.active { background:#b0000e; }
-    .section { display:none; max-width:800px; margin:20px auto; padding:20px; }
-    .section.active { display:block; }
-    label { display:block; margin-bottom:10px; }
-    input, select, textarea {
-      width:100%; padding:8px; margin-top:5px;
-      border:1px solid #ccc; border-radius:4px;
-      transition: background .3s, color .3s, border-color .3s;
+
+    .add-recipe label,
+    .filter-recipes label {
+      display: block;
+      font-weight: 600;
+      margin: 1.2rem 0 0.5rem;
     }
-    body.dark input, body.dark select, body.dark textarea {
-      background:var(--input-dark); color:#fff; border-color:#444;
+
+    .add-recipe input,
+    .add-recipe textarea,
+    .filter-recipes input {
+      width: 100%;
+      font-size: 1rem;
+      border: 2px solid #00ff15;
+      border-radius: 0.5rem;
+      padding: 0.6rem;
+      margin-bottom: 1rem;
+      background: #fff;
     }
-    textarea { resize:vertical; }
-    .buttons { display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; }
-    .buttons button {
-      flex:1; padding:10px; background:var(--red); color:#fff;
-      border:none; border-radius:4px; cursor:pointer;
+
+    .add-recipe button {
+      background: #00ff15;
+      color: #fff;
+      border: none;
+      border-radius: 0.4rem;
+      padding: 0.7rem 2.1rem;
+      font-size: 1.05rem;
+      cursor: pointer;
+      font-weight: bold;
     }
-    ul#seznam, ul#historyList { list-style:none; padding:0; margin-top:10px; }
-    ul#seznam li {
-      margin-bottom:5px;
-      white-space: normal;
-      overflow-wrap: break-word;
+
+    .add-recipe button:hover {
+      background: #00cd11;
     }
-    ul#historyList {
-      max-height:200px; overflow:auto;
-      border:1px solid #ccc; border-radius:4px;
-      background:#fff;
+
+    .recipe-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      /* místo auto-fit */
+      gap: 1.5rem;
     }
-    ul#historyList li {
-      padding:8px; border-bottom:1px solid #eee; cursor:pointer;
-      white-space: normal; overflow-wrap: break-word;
+
+    .recipe-card {
+      background: #fff;
+      border-radius: 0.6rem;
+      box-shadow: 0 2px 12px #0002;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
-    ul#historyList li:hover, ul#historyList li.selected { background:#f0f0f0; }
-    body.dark ul#historyList { background:var(--input-dark); border-color:#444; }
-    body.dark ul#historyList li {
-      background:var(--input-dark); color:var(--text-light);
-      border-bottom-color:#333;
+
+    .recipe-card img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
     }
-    body.dark ul#historyList li:hover, body.dark ul#historyList li.selected {
-      background:#333;
+
+    .recipe-content {
+      padding: 1rem 1.2rem 1rem 1.2rem;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
     }
-    #recordDetail {
-      margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:4px;
-      background:#fafafa; white-space: pre-wrap; overflow-wrap: break-word;
-      max-height:200px; overflow-y:auto;
+
+    .recipe-content h2 {
+      font-size: 1.4rem;
+      margin-bottom: 0.4rem;
     }
-    body.dark #recordDetail {
-      background:var(--input-dark); color:var(--text-light);
-      border-color:#444;
+
+    .ingredients,
+    .steps {
+      margin-bottom: 0.7rem;
     }
-    /* Grafy */
-    #sectionCharts .charts-wrapper {
-      display:flex; gap:20px; flex-wrap:wrap;
+
+    .ingredients ul,
+    .steps ol {
+      padding-left: 1.2rem;
     }
-    #sectionCharts .charts-wrapper > div {
-      flex:1 1 0; min-width:300px;
+
+    .steps ol li,
+    .ingredients ul li {
+      white-space: pre-wrap;
+      word-break: break-word;
     }
-    .chart-container {
-      position:relative; width:100%; height:400px; margin-bottom:20px;
+
+    .button-group {
+      margin-top: auto;
+      display: flex;
+      gap: 0.6rem;
     }
-    canvas { display:block; }
-    @media(max-width:600px){
-      .nav, .buttons { flex-direction:column; }
-      .nav button, .buttons button { width:100%; }
+
+    .edit-btn,
+    .delete-btn {
+      padding: 0.5rem 1.2rem;
+      border: none;
+      border-radius: 0.3rem;
+      cursor: pointer;
+      font-weight: 600;
     }
+
+    .edit-btn {
+      background: #2196f3;
+      color: #fff;
+    }
+
+    .edit-btn:hover {
+      background: #1479c9;
+    }
+
+    .delete-btn {
+      background: #f44336;
+      color: #fff;
+    }
+
+    .delete-btn:hover {
+      background: #c81d16;
+    }
+
+    .pagination {
+      text-align: center;
+      margin: 2rem 0 3rem 0;
+    }
+
+    .pagination button {
+      padding: 0.4rem 1.3rem;
+      font-size: 1rem;
+      border-radius: 0.3rem;
+      border: none;
+      background: #eee;
+      margin: 0 0.5rem;
+      cursor: pointer;
+    }
+
+    .pagination button:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+
+    .pagination span {
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+
+    /* reklama po stranách */
+    .reklamni-obrazek {
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      width: 400px;
+      background-size: cover;
+      background-position: center;
+      z-index: -1;
+    }
+
+    .reklamni-obrazek.left {
+      left: 0;
+      background-image: url('test.webp');
+      /* ← nahraď svou cestou nebo URL */
+    }
+
+    .reklamni-obrazek.right {
+  right: 0;
+  background-image: url('test1.PNG');  /* Takhle to má být! */
+  /* ← může být stejná nebo jiná */
+}
+
+    /* Zajištění, že střed stránky není překryt */
+    body {
+      margin-left: 300px;
+      margin-right: 300px;
+      background-color: #fdfdfd;
+    }
+
+    @media (max-width: 900px) {
+  .recipe-grid {
+    grid-template-columns: 1fr !important;  /* Jeden sloupec místo dvou */
+    gap: 1rem;
+  }
+  .add-recipe, .filter-recipes, .donate-section {
+    padding: 1rem 0.4rem !important;  /* Menší odsazení na mobilu */
+  }
+  .recipe-card {
+    margin: 0 auto;
+    min-width: 0;
+  }
+  input, textarea, button {
+    font-size: 1em !important;
+  }
+}
+
+      body {
+        margin-left: 0;
+        margin-right: 0;
+      }
+    }
+    .donate-section { 
+  text-align: center; 
+  margin-bottom: 2rem; 
+  background: #fff; 
+  border-radius: 1rem; 
+  box-shadow: 0 4px 16px #0001;
+  padding: 1.3rem 1rem 1rem 1rem;
+  max-width: 900px;
+  margin-left: auto; margin-right: auto;
+}
+.donate-section h2 { margin-top: 0; margin-bottom: 1rem; }
+.donate-qrs { display: flex; flex-wrap: wrap; gap: 1.2rem; justify-content: center; align-items: flex-end;}
+.donate-qrs div { text-align: center; }
+.qr-small {
+  width: 65px; height: 65px;
+  cursor: pointer;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 8px #0002;
+  transition: transform 0.18s;
+  background: #fafafa;
+}
+.qr-small:hover { transform: scale(1.15);}
+.qr-big {
+  display: block;
+  margin: 0 auto;
+  max-width: 90vw;
+  max-height: 90vh;
+  box-shadow: 0 6px 32px #0008;
+  background: #fff;
+  border-radius: 1rem;
+}
+.qr-modal {
+  position: fixed; left: 0; top: 0; width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.6);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1100;
+}
+.qr-modal-overlay {
+  position: absolute; left: 0; top: 0; width: 100vw; height: 100vh;
+  z-index: 0;
+}
+#qr-modal-img { position: relative; z-index: 1; }
+@media (max-width:900px) {
+  .donate-qrs { gap: 0.5rem;}
+  .qr-small { width: 48px; height: 48px;}
+}
+.donate-section,
+.donate-section h2,
+.donate-section .donate-note {
+  text-align: center !important;
+}
+.donate-bg-img {
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+  display: block;
+  margin: 0 auto 0.5rem auto;
+  border-radius: 1.1rem;
+  object-fit: cover;
+}
+.donate-section {
+  max-width: 700px;
+  margin: 0 auto 1.5rem auto;
+  padding: 1.2rem 0.5rem;
+  box-sizing: border-box;
+  background: #fff;
+  border-radius: 1.1rem;
+  text-align: center;
+}
+@media (max-width: 700px) {
+  .donate-section {
+    padding: 0.6rem 0.1rem 0.9rem 0.1rem;
+    border-radius: 0.5rem;
+  }
+  .donate-bg-img {
+    max-width: 100vw;
+    border-radius: 0.7rem;
+  }
+}
+
+  input, textarea, button {
+    font-size: 1em !important;
+  }
+}
+body {
+  background: #f9f9f9;
+  margin: 0;
+}
+
+main {
+  max-width: 500px;
+  margin: 40px auto 0 auto;
+  background: #fff;
+  border-radius: 1.2rem;
+  box-shadow: 0 4px 20px #0001;
+  padding: 2rem 1.2rem;
+}
+
+/* Pro PC */
+@media (min-width: 900px) {
+  main {
+    max-width: 850px;
+    padding: 2.5rem 2.5rem;
+  }
+}
+
+/* Velké monitory */
+@media (min-width: 1400px) {
+  main {
+    max-width: 1100px;
+  }
+}
+.ads-bottom {
+  margin: 2rem auto 3rem auto;
+  max-width: 900px;
+  text-align: center;
+}
+
+.ads-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.3rem;
+  justify-items: center;
+  align-items: center;
+}
+
+.ads-grid img {
+  width: 110px;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px #0001;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.ads-grid img:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 18px #0002;
+}
+
+/* Responsivita na menších displejích */
+@media (max-width: 600px) {
+  .ads-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .ads-grid img {
+    width: 95px;
+    height: 95px;
+  }
+}
   </style>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+
 <body>
-  <header>
-    <div class="logo">La lopatos</div>
-    <h1>La Bažanti</h1>
-    <button id="darkToggle" class="dark-toggle">🌙 Tmavý režim</button>
-  </header>
 
-  <div class="nav">
-    <button id="btnSummary" class="active">Souhrn</button>
-    <button id="btnHandover">Předání</button>
-    <button id="btnHistory">Historie</button>
-    <button id="btnCharts">Grafy</button>
-  </div>
+  <div class="nav">Receptář AVE JA</div>
 
-  <!-- Souhrn -->
-  <div id="sectionSummary" class="section active">
-    <h2>Souhrn událostí</h2>
-    <form id="summaryForm">
-      <label>Směna:
-    <select id="dsTypeSummary" required>
-      <option>DS1</option>
-      <option>DS2</option>
-    </select>
-  </label>
-      <label>Datum:<input type="date" id="datum" required></label>
-      <label>Linka:
-        <select id="linka" required>
-          <option value="">Vyberte</option>
-          <option>Linka A</option>
-          <option>Linka B</option>
-          <option>Linka 1</option>
-          <option>Linka 2</option>
-        </select>
-      </label>
-      <label>Typ:
-        <select id="typ" required>
-          <option value="">Vyberte</option>
-          <option>Mechanická porucha</option>
-          <option>Elektrická porucha</option>
-          <option>Údržba</option>
-          <option>Jiné</option>
-        </select>
-      </label>
-      <label id="otherWrapper" style="display:none;">
-        Upřesnění:<input type="text" id="other">
-      </label>
-      <label>Popis události:<textarea id="note" rows="2" required></textarea></label>
-      <label>Jméno:
-  <select id="name" required>
-    <option value="">Vyberte</option>
-    <option>Jana Nováková</option>
-    <option>Petr Dvořák</option>
-    <option>Lucie Horáková</option>
-    <option>Tomáš Svoboda</option>
-  </select>
-</label>
-    </form>
-    <div class="buttons">
-      <button id="addBtn">Přidat</button>
-      <button id="sendBtn">Odeslat</button>
-      <button id="clearBtn">Smazat</button>
+  <!-- LEVÝ OBRÁZKOVÝ BANNER -->
+  <div class="reklamni-obrazek left"></div>
+
+  <!-- PRAVÝ OBRÁZKOVÝ BANNER -->
+  <div class="reklamni-obrazek right"></div>
+
+<section class="donate-section">
+  <h2>Podpořte/Donate provoz</h2>
+  <div class="donate-qrs">
+    <div>
+      <img src="R100.png" alt="QR 100 Kč" class="qr-small">
+      <div class="qr-popis">0,1K Kč</div>
     </div>
-    <ul id="seznam"></ul>
-  </div>
-
-  <!-- Předání -->
-  <div id="sectionHandover" class="section">
-    <h2>Předávání směny</h2>
-    <form id="handoverForm">
-      <label>Směna:
-        <select id="dsType">
-          <option>DS1</option>
-          <option selected>DS2</option>
-        </select>
-      </label>
-      <label>Datum:<input type="date" id="hDate" required></label>
-      <label>Lokace:
-        <select id="loc">
-          <option>Slatina</option>
-          <option>Blucina</option>
-        </select>
-      </label>
-      <label id="l1">Událost – Linka 1 Slatina:<textarea id="h1" rows="2" required></textarea></label>
-      <label id="l2">Událost – Linka 2 Slatina:<textarea id="h2" rows="2" required></textarea></label>
-      <label>Poznámky:<textarea id="hNote" rows="2" required></textarea></label>
-      <label>Jméno:
-  <select id="hName" required>
-    <option value="" disabled selected>Vyber jméno</option>
-    <option>Jana Nováková</option>
-    <option>Tomáš Dvořák</option>
-    <option>Lucie Malá</option>
-    <option>Martin Horák</option>
-    <option>Eva Benešová</option>
-  </select>
-</label>
-    </form>
-    <div class="buttons">
-      <button id="hEmailBtn">Email</button>
-      <button id="hClearBtn">Smazat</button>
+    <div>
+      <img src="R200.png" alt="QR 200 Kč" class="qr-small">
+      <div class="qr-popis">0,2K Kč</div>
+    </div>
+    <div>
+      <img src="R300.png" alt="QR 300 Kč" class="qr-small">
+      <div class="qr-popis">0,5K Kč</div>
+    </div>
+    <div>
+      <img src="R500.png" alt="QR 500 Kč" class="qr-small">
+      <div class="qr-popis">1,0K Kč</div>
+    </div>
+    <div>
+      <img src="R1000.png" alt="QR 1000 Kč" class="qr-small">
+      <div class="qr-popis">Volitelné</div>
     </div>
   </div>
+  <div class="donate-note">Kliknutím na QR Kód obrázek zvětšite </div>
+</section>
 
-  <!-- Předání -->
-  <div id="sectionHandover" class="section">
-    <h2>Předávání směny</h2>
-    <form id="handoverForm">
-      <label>Typ DS:
-        <select id="dsType">
-          <option>DS1</option>
-          <option selected>DS2</option>
-        </select>
-      </label>
-      <label>Datum:<input type="date" id="hDate" required></label>
-      <label>Lokace:
-        <select id="loc">
-          <option>Slatina</option>
-          <option>Blucina</option>
-        </select>
-      </label>
-      <label id="l1">Událost – Linka 1 Slatina:<textarea id="h1" rows="2" required></textarea></label>
-      <label id="l2">Událost – Linka 2 Slatina:<textarea id="h2" rows="2" required></textarea></label>
-      <label>Poznámky:<textarea id="hNote" rows="2" required></textarea></label>
-      <label>Jméno:
-  <select id="hName" required>
-    <option value="" disabled selected>Vyber jméno</option>
-    <option>Jana Nováková</option>
-    <option>Tomáš Dvořák</option>
-    <option>Lucie Malá</option>
-    <option>Martin Horák</option>
-    <option>Eva Benešová</option>
-  </select>
-</label>
-    </form>
-    <div class="buttons">
-      <button id="hEmailBtn">Email</button>
-      <button id="hClearBtn">Smazat</button>
-    </div>
+<!-- MODAL na zvětšený QR kód -->
+<div id="qr-modal" class="qr-modal" style="display:none;">
+  <div class="qr-modal-overlay"></div>
+  <img id="qr-modal-img" src="" alt="QR kód" class="qr-big">
+</div>
+
+  <main>
+    <section class="add-recipe">
+      <form id="recipe-form" autocomplete="off">
+        <label for="title">Název/Druh:</label>
+        <input type="text" id="title" required placeholder="Název receptu">
+        <label for="image">Obrázek (URL):</label>
+        <input type="url" id="image" placeholder="https://...">
+        <label for="ingredients">Ingredience/Poměr přísad (každá na nový řádek):</label>
+        <textarea id="ingredients" rows="4" required placeholder="Mouka&#10;Cukr&#10;Vejce"></textarea>
+        <label for="steps">Postup/Úpravy (každý krok na nový řádek):</label>
+        <textarea id="steps" rows="4" required placeholder="Krok 1&#10;Krok 2"></textarea>
+        <label for="cooking-time">Doba vaření (minuty):</label>
+        <input type="number" id="cooking-time" min="1" placeholder="např. 40">
+        <label for="portion-count">Počet porcí:</label>
+        <input type="number" id="portion-count" min="1" placeholder="např. 4">
+        <button type="submit" id="submit-btn">Přidat recept</button>
+      </form>
+    </section>
+
+    <section class="filter-recipes">
+    <h2>Vyhledávání receptu</h2>
+      <label for="filter-name">Název:</label>
+      <input type="text" id="filter-name" placeholder="Hledat podle názvu...">
+      <label for="filter-ingredient">Ingredience:</label>
+      <input type="text" id="filter-ingredient" placeholder="Hledat podle ingredience...">
+    </section>
+
+    <section class="recipe-grid" id="recipe-grid">
+      <!-- Recepty -->
+    </section>
+
+    <section class="pagination">
+      <button id="prev-page">Předchozí</button>
+      <span id="page-info"></span>
+      <button id="next-page">Další</button>
+    </section>
+    
+    <section class="ads-bottom">
+  <div class="ads-grid">
+    <img src=""https://dummyimage.com/120x120/43b3fa/ffffff&text=Reklama+1"" alt="Reklama 1">
+    <img src=""https://dummyimage.com/120x120/43b3fa/ffffff&text=Reklama+1"" alt="Reklama 2">
+    <img src=""https://dummyimage.com/120x120/43b3fa/ffffff&text=Reklama+1"" alt="Reklama 3">
+    <img src="reklama 1.jpg" alt="Reklama 4">
+    <img src="reklama 2.jpg" alt="Reklama 5">
+    <img src="reklama 3.jpg" alt="Reklama 6">
+    <img src="ad7.jpg" alt="Reklama 7">
+    <img src="ad8.jpg" alt="Reklama 8">
+    <img src="ad9.jpg" alt="Reklama 9">
   </div>
+</section>
+  </main>
+  
+<script>
+const HESLO_MAZANI = "recept2024";
 
-  <!-- Historie -->
-  <div id="sectionHistory" class="section">
-    <h2>Historie</h2>
-    <label>Hledat:<input id="search" type="text"></label>
-    <div class="buttons">
-      <button id="exportBtn">Export CSV</button>
-      <button id="histClearBtn">Vymazat historii</button>
-    </div>
-    <ul id="historyList"></ul>
-    <div id="recordDetail">Vyber záznam...</div>
-  </div>
+let filterName = '', filterIngredient = '', editingIndex = null;
+let currentPage = 1;
+const recipesPerPage = 6;
 
-  <!-- Grafy -->
-  <div id="sectionCharts" class="section">
-    <h2>Grafy</h2>
-    <div class="charts-wrapper">
-      <div>
-        <h3>Podle typu události</h3>
-        <div class="chart-container"><canvas id="typeChart"></canvas></div>
+const getRecipes = async () => {
+  const res = await fetch('nacti.php');
+  return res.ok ? await res.json() : [];
+};
+
+const saveRecipes = async (recs) => {
+  await fetch('uloz.php', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(recs)
+  });
+};
+
+function createCard(recipe, idx) {
+  const article = document.createElement('article');
+  article.className = 'recipe-card';
+  article.innerHTML = `
+    ${recipe.image ? `<img src="${recipe.image}" alt="${recipe.title}">` : ''}
+    <div class="recipe-content">
+      <h2>${recipe.title}</h2>
+      ${recipe.cookingTime ? `<div class="cooking-time"><strong>Doba vaření:</strong> ${recipe.cookingTime} minut</div>` : ''}
+      ${recipe.portionCount ? `<div class="portion-count"><strong>Počet porcí:</strong> ${recipe.portionCount}</div>` : ''}
+      <div class="ingredients">
+        <h3>Ingredience:</h3>
+        <ul>${recipe.ingredients.map(i => `<li>${i}</li>`).join('')}</ul>
       </div>
-      <div>
-        <h3>Podle linky</h3>
-        <div class="chart-container"><canvas id="lineChart"></canvas></div>
+      <div class="steps">
+        <h3>Postup:</h3>
+        <ol>${recipe.steps.map(s => `<li>${s}</li>`).join('')}</ol>
+      </div>
+      <div class="button-group">
+        <button class="edit-btn">Upravit</button>
+        <button class="delete-btn">Smazat</button>
       </div>
     </div>
-  </div>
+  `;
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const KEY_SUM  = 'summaryRecords';
-      const KEY_HIST = 'historyRecords';
-
-      const loadSum  = () => JSON.parse(localStorage.getItem(KEY_SUM)  || '[]');
-      const saveSum  = arr => localStorage.setItem(KEY_SUM,  JSON.stringify(arr));
-      const loadHist = () => JSON.parse(localStorage.getItem(KEY_HIST) || '[]');
-      const saveHist = arr => localStorage.setItem(KEY_HIST, JSON.stringify(arr));
-
-      // Tmavý režim
-      const darkToggle = document.getElementById('darkToggle');
-      if (localStorage.getItem('darkMode') === 'true') {
-        document.body.classList.add('dark');
-        darkToggle.textContent = '☀️ Světlý režim';
-      }
-      darkToggle.addEventListener('click', () => {
-        document.body.classList.toggle('dark');
-        const dm = document.body.classList.contains('dark');
-        darkToggle.textContent = dm ? '☀️ Světlý režim' : '🌙 Tmavý režim';
-        localStorage.setItem('darkMode', dm);
-      });
-
-      // Přepínání sekcí
-      ['Summary','Handover','History','Charts'].forEach(tab => {
-        document.getElementById('btn'+tab).addEventListener('click', () => {
-          document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-          document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
-          document.getElementById('section'+tab).classList.add('active');
-          document.getElementById('btn'+tab).classList.add('active');
-          localStorage.setItem('activeTab', tab);
-          if (tab === 'Charts') renderChart();
-        });
-      });
-      const savedTab = localStorage.getItem('activeTab') || 'Summary';
-      document.getElementById('btn'+savedTab).click();
-
-      // Předvyplnit datum
-      document.getElementById('datum').valueAsDate = new Date();
-      document.getElementById('hDate').valueAsDate  = new Date();
-
-      // Souhrn – Jiné…
-      document.getElementById('typ').addEventListener('change', e => {
-        document.getElementById('otherWrapper').style.display = e.target.value === 'Jiné' ? 'block' : 'none';
-      });
-
-      // Přidat Souhrn
-      document.getElementById('addBtn').addEventListener('click', () => {
-        const d = document.getElementById('datum').value;
-        const l = document.getElementById('linka').value;
-        let t = document.getElementById('typ').value;
-        if (t === 'Jiné') t = document.getElementById('other').value.trim();
-        const p = document.getElementById('note').value;
-        const n = document.getElementById('name').value;
-        if (!d||!l||!t||!p||!n) return alert('Vyplňte všechna pole.');
-        const rec = { datum:d, linka:l, typUdalosti:t, poznamka:p, jmeno:n };
-        const sumArr = loadSum(); sumArr.push(rec); saveSum(sumArr); renderSummary();
-        const histArr = loadHist(); histArr.push(rec); saveHist(histArr); renderHistory();
-        if (document.getElementById('sectionCharts').classList.contains('active')) renderChart();
-        document.getElementById('summaryForm').reset();
-        document.getElementById('datum').valueAsDate = new Date();
-        document.getElementById('otherWrapper').style.display = 'none';
-      });
-
-      function renderSummary() {
-        const ul = document.getElementById('seznam');
-        ul.innerHTML = '';
-        loadSum().forEach(r => {
-          const li = document.createElement('li');
-          li.textContent = `${r.datum} | ${r.linka} | ${r.typUdalosti} | ${r.poznamka}`;
-          ul.appendChild(li);
-        });
-      }
-      renderSummary();
-
-      // Odeslat Souhrn
-      document.getElementById('sendBtn').addEventListener('click', () => {
-        const arr = loadSum(); if (!arr.length) return alert('Žádné záznamy.');
-        const body = arr.map(r => `${r.datum} | ${r.linka} | ${r.typUdalosti} | ${r.poznamka} | ${r.jmeno}`)
-                        .join('\n');
-        window.location.href = `mailto:hylak.kamil@inventec.com,klco.roman@inventec.com,cech.adam@inventec.com,janas.jan@inventec.com,brablec.pavel@inventec.com,postraneckych.danny@inventec.com,teryngel.frantisek@inventec.com,holeksa.robert@inventec.com?subject=${encodeURIComponent('Souhrn událostí DS2')}&body=${encodeURIComponent(body)}`;
-      });
-
-      // Smazat Souhrn
-      document.getElementById('clearBtn').addEventListener('click', () => {
-        localStorage.removeItem(KEY_SUM);
-        renderSummary();
-      });
-
-      // Předání – popisky
-      document.getElementById('loc').addEventListener('change', () => {
-        const v = document.getElementById('loc').value;
-        document.getElementById('l1').firstChild.textContent = v==='Slatina'
-          ? 'Událost – Linka 1 Slatina:' : 'Událost – Linka A Blucina:';
-        document.getElementById('l2').firstChild.textContent = v==='Slatina'
-          ? 'Událost – Linka 2 Slatina:' : 'Událost – Linka B Blucina:';
-      });
-
-      // Předání – email
-      document.getElementById('hEmailBtn').addEventListener('click', () => {
-  const dRaw = document.getElementById('hDate').value;
-  const d = dRaw ? dRaw.split('-').reverse().join('.') : '';
-  const ds = document.getElementById('dsType').value;
-  const loc = document.getElementById('loc').value;
-  const l1 = document.getElementById('h1').value.trim();
-  const l2 = document.getElementById('h2').value.trim();
-  const p = document.getElementById('hNote').value.trim();
-  const n = document.getElementById('hName').value.trim();
-
-  if (!d || !l1 || !l2 || !p || !n) {
-    return alert('Vyplňte všechna pole.');
-  }
-
-  // Rozlišení názvu linek podle lokace
-  let label1 = 'Linka 1';
-  let label2 = 'Linka 2';
-  if (loc.toLowerCase() === 'blucina' || loc.toLowerCase() === 'blučína') {
-    label1 = 'Linka A';
-    label2 = 'Linka B';
-  }
-
-  const subject = `Předání směny ${ds} - ${loc}`;
-  const body = 
-`📋 Předání směny – ${ds} ${loc}, ${d}
-
-• ${label1}: ${l1}
-• ${label2}: ${l2}
-• Poznámky: ${p}
-
-Předává: ${n}
-Pro: ${loc}`;
-
-  const emailTo = [
-    "hylak.kamil@inventec.com",
-    "klco.roman@inventec.com",
-    "cech.adam@inventec.com",
-    "janas.jan@inventec.com",
-    "brablec.pavel@inventec.com",
-    "postraneckych.danny@inventec.com",
-    "teryngel.frantisek@inventec.com",
-    "holeksa.robert@inventec.com"
-  ].join(";");
-
-  window.location.href = `mailto:${emailTo}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-});
-
-
-      // Předání – Teams placeholder
-      document.getElementById('hTeamsBtn').addEventListener('click', () => alert('Odeslat do Teams…'));
-
-      // Předání – smazat
-      document.getElementById('hClearBtn').addEventListener('click', () => {
-        document.getElementById('handoverForm').reset();
-        document.getElementById('hDate').valueAsDate = new Date();
-      });
-
-      // Historie – render/filter/detail
-      function renderHistory() {
-        const arr = loadHist();
-        const f   = document.getElementById('search').value.toLowerCase();
-        const ul  = document.getElementById('historyList');
-        ul.innerHTML = '';
-        arr.filter(r =>
-          r.datum.includes(f) ||
-          r.linka.toLowerCase().includes(f) ||
-          r.typUdalosti.toLowerCase().includes(f) ||
-          r.poznamka.toLowerCase().includes(f) ||
-          r.jmeno.toLowerCase().includes(f)
-        ).forEach((r,i) => {
-          const li = document.createElement('li');
-          li.textContent = `${r.datum} | ${r.linka} | ${r.typUdalosti} | ${r.jmeno}`;
-          li.addEventListener('click', () => {
-            document.querySelectorAll('#historyList li').forEach((el,j) =>	el.classList.toggle('selected', j===i));  
-            document.getElementById('recordDetail').innerHTML =
-              `<strong>Datum:</strong> ${r.datum}<br>` +
-              `<strong>Linka:</strong> ${r.linka}<br>` +
-              `<strong>Typ události:</strong> ${r.typUdalosti}<br>` +
-              `<strong>Poznámka:</strong> ${r.poznamka}<br>` +
-              `<strong>Jméno:</strong> ${r.jmeno}`;
-          });
-          ul.appendChild(li);
-        });
-      }
-      renderHistory();
-      document.getElementById('search').addEventListener('input', renderHistory);
-
-      // Export CSV
-   document.getElementById('exportBtn').addEventListener('click', () => {
-  const arr = loadHist();
-  if (!arr.length) return alert('Žádné záznamy k exportu.');
-
-  const bom = '\uFEFF';
-  let csv = bom + 'Datum;Linka;Typ události;Popis události;Operátor\r\n';
-
-  arr.forEach(r => {
-    // pokud r.poznamka neexistuje, použijeme prázdný string
-    const rawNote = r.poznamka || '';
-    const note = rawNote
-      .replace(/"/g, '""')
-      .replace(/\r?\n/g, ' ');
-    csv += [
-      r.datum || '',
-      r.linka || '',
-      r.typUdalosti || '',
-      `"${note}"`,
-      r.jmeno || ''
-    ].join(';') + '\r\n';
+  article.querySelector('.edit-btn')?.addEventListener('click', () => {
+    document.getElementById('title').value = recipe.title;
+    document.getElementById('image').value = recipe.image;
+    document.getElementById('cooking-time').value = recipe.cookingTime || '';
+    document.getElementById('portion-count').value = recipe.portionCount || '';
+    document.getElementById('ingredients').value = recipe.ingredients.join('\n');
+    document.getElementById('steps').value = recipe.steps.join('\n');
+    editingIndex = idx;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    document.getElementById('submit-btn').textContent = 'Uložit změny';
   });
 
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const url  = URL.createObjectURL(blob);
-  const a    = document.createElement('a');
-  a.href     = url;
-  a.download = 'historie.csv';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-});
-
-      // Vymazat historii
-      document.getElementById('histClearBtn').addEventListener('click', () => {
-        if (!confirm('Opravdu vymazat historii?')) return;
-        localStorage.removeItem(KEY_HIST);
-        renderHistory();
-        document.getElementById('recordDetail').textContent = 'Vyber záznam...';
+  article.querySelector('.delete-btn')?.addEventListener('click', () => {
+    const zadane = prompt("Zadej heslo pro smazání receptu:");
+    if (zadane === HESLO_MAZANI) {
+      getRecipes().then(arr => {
+        arr.splice(idx, 1);
+        saveRecipes(arr).then(() => renderRecipes());
       });
+    } else if (zadane !== null) {
+      alert("Nesprávné heslo!");
+    }
+  });
 
-      // Grafy
-      function renderChart() {
-        const data = loadHist();
+  return article;
+}
 
-        const byType = data.reduce((acc,r) => {
-          acc[r.typUdalosti] = (acc[r.typUdalosti]||0) + 1;
-          return acc;
-        }, {});
-        const ctx1 = document.getElementById('typeChart').getContext('2d');
-        new Chart(ctx1, {
-          type: 'bar',
-          data: {
-            labels: Object.keys(byType),
-            datasets: [{ label: 'Počet událostí', data: Object.values(byType) }]
-          },
-          options: { maintainAspectRatio:false, scales:{ y:{ beginAtZero:true } } }
-        });
+async function renderRecipes() {
+  const grid = document.getElementById('recipe-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
 
-        const byLine = data.reduce((acc,r) => {
-          acc[r.linka] = (acc[r.linka]||0) + 1;
-          return acc;
-        }, {});
-        const ctx2 = document.getElementById('lineChart').getContext('2d');
-        new Chart(ctx2, {
-          type: 'bar',
-          data: {
-            labels: Object.keys(byLine),
-            datasets: [{ label: 'Počet událostí', data: Object.values(byLine) }]
-          },
-          options: { maintainAspectRatio:false, scales:{ y:{ beginAtZero:true } } }
-        });
-      }
+  let arr = await getRecipes();
+  if (!Array.isArray(arr)) arr = [];
+
+  if (filterName) arr = arr.filter(r => r.title.toLowerCase().includes(filterName));
+  if (filterIngredient) arr = arr.filter(r => r.ingredients.some(i => i.toLowerCase().includes(filterIngredient)));
+
+  const totalPages = Math.max(1, Math.ceil(arr.length / recipesPerPage));
+  if (currentPage > totalPages) currentPage = totalPages;
+  const start = (currentPage - 1) * recipesPerPage;
+  const end = start + recipesPerPage;
+  const visibleRecipes = arr.slice(start, end);
+
+  visibleRecipes.forEach((r, i) => grid.appendChild(createCard(r, start + i)));
+  document.getElementById('page-info').textContent = `Stránka ${currentPage} / ${totalPages}`;
+  document.getElementById('prev-page').disabled = currentPage === 1;
+  document.getElementById('next-page').disabled = currentPage === totalPages;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderRecipes();
+
+  document.getElementById('recipe-form')?.addEventListener('submit', async e => {
+    e.preventDefault();
+    const newRec = {
+      title: document.getElementById('title').value.trim(),
+      image: document.getElementById('image').value.trim(),
+      cookingTime: document.getElementById('cooking-time').value.trim(),
+      portionCount: document.getElementById('portion-count').value.trim(),
+      ingredients: document.getElementById('ingredients').value.trim().split('\n').filter(x => x),
+      steps: document.getElementById('steps').value.trim().split('\n').filter(x => x)
+    };
+    const arr = await getRecipes();
+    if (editingIndex !== null) {
+      arr[editingIndex] = newRec;
+      editingIndex = null;
+    } else {
+      arr.push(newRec);
+    }
+    await saveRecipes(arr);
+    e.target.reset();
+    document.getElementById('submit-btn').textContent = 'Přidat recept';
+    renderRecipes();
+  });
+
+  document.getElementById('filter-name')?.addEventListener('input', e => {
+    filterName = e.target.value.trim().toLowerCase();
+    currentPage = 1;
+    renderRecipes();
+  });
+
+  document.getElementById('filter-ingredient')?.addEventListener('input', e => {
+    filterIngredient = e.target.value.trim().toLowerCase();
+    currentPage = 1;
+    renderRecipes();
+  });
+
+  document.getElementById('prev-page')?.addEventListener('click', () => {
+    if (currentPage > 1) {
+      currentPage--;
+      renderRecipes();
+    }
+  });
+
+  document.getElementById('next-page')?.addEventListener('click', async () => {
+    const arr = await getRecipes();
+    let filtered = arr;
+    if (filterName) filtered = filtered.filter(r => r.title.toLowerCase().includes(filterName));
+    if (filterIngredient) filtered = filtered.filter(r => r.ingredients.some(i => i.toLowerCase().includes(filterIngredient)));
+    const totalPages = Math.max(1, Math.ceil(filtered.length / recipesPerPage));
+    if (currentPage < totalPages) {
+      currentPage++;
+      renderRecipes();
+    }
+  });
+});
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('.qr-small').forEach(img => {
+    img.addEventListener('click', e => {
+      document.getElementById('qr-modal-img').src = img.src;
+      document.getElementById('qr-modal').style.display = 'flex';
     });
-  </script>
+  });
+  document.getElementById('qr-modal').addEventListener('click', function(e){
+    if (e.target === this || e.target.classList.contains('qr-modal-overlay')) {
+      this.style.display = 'none';
+      document.getElementById('qr-modal-img').src = '';
+    }
+  });
+});
+</script>
 </body>
+
 </html>
