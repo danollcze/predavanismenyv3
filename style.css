@@ -182,13 +182,13 @@ body {
 
 .reklamni-obrazek.left {
     left: 0;
-    background-image: url('test.webp');
+    background-image: url('leva.png');
     /* ← nahraď svou cestou nebo URL */
 }
 
 .reklamni-obrazek.right {
     right: 0;
-    background-image: url('test1.PNG');
+    background-image: url('prava.png');
     /* Takhle to má být! */
     /* ← může být stejná nebo jiná */
 }
