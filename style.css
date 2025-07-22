@@ -1,0 +1,537 @@
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #f9f9f9;
+    color: #222;
+    margin: 0;
+}
+
+.nav {
+    background: #00ff15;
+    color: #fff;
+    font-size: 2rem;
+    font-weight: bold;
+    text-align: center;
+    padding: 1.2rem 0;
+    letter-spacing: 1px;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+}
+
+.add-recipe,
+.filter-recipes {
+    background: #fff;
+    padding: 2rem 2.5rem;
+    border-radius: 1rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 16px #0001;
+}
+
+.add-recipe label,
+.filter-recipes label {
+    display: block;
+    font-weight: 600;
+    margin: 1.2rem 0 0.5rem;
+}
+
+.add-recipe input,
+.add-recipe textarea,
+.filter-recipes input {
+    width: 100%;
+    font-size: 1rem;
+    border: 2px solid #00ff15;
+    border-radius: 0.5rem;
+    padding: 0.6rem;
+    margin-bottom: 1rem;
+    background: #fff;
+}
+
+.add-recipe button {
+    background: #00ff15;
+    color: #fff;
+    border: none;
+    border-radius: 0.4rem;
+    padding: 0.7rem 2.1rem;
+    font-size: 1.05rem;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.add-recipe button:hover {
+    background: #00cd11;
+}
+
+.recipe-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    /* místo auto-fit */
+    gap: 1.5rem;
+}
+
+.recipe-card {
+    background: #fff;
+    border-radius: 0.6rem;
+    box-shadow: 0 2px 12px #0002;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.recipe-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.recipe-content {
+    padding: 1rem 1.2rem 1rem 1.2rem;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.recipe-content h2 {
+    font-size: 1.4rem;
+    margin-bottom: 0.4rem;
+}
+
+.ingredients,
+.steps {
+    margin-bottom: 0.7rem;
+}
+
+.ingredients ul,
+.steps ol {
+    padding-left: 1.2rem;
+}
+
+.steps ol li,
+.ingredients ul li {
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.button-group {
+    margin-top: auto;
+    display: flex;
+    gap: 0.6rem;
+}
+
+.edit-btn,
+.delete-btn {
+    padding: 0.5rem 1.2rem;
+    border: none;
+    border-radius: 0.3rem;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.edit-btn {
+    background: #2196f3;
+    color: #fff;
+}
+
+.edit-btn:hover {
+    background: #1479c9;
+}
+
+.delete-btn {
+    background: #f44336;
+    color: #fff;
+}
+
+.delete-btn:hover {
+    background: #c81d16;
+}
+
+.pagination {
+    text-align: center;
+    margin: 2rem 0 3rem 0;
+}
+
+.pagination button {
+    padding: 0.4rem 1.3rem;
+    font-size: 1rem;
+    border-radius: 0.3rem;
+    border: none;
+    background: #eee;
+    margin: 0 0.5rem;
+    cursor: pointer;
+}
+
+.pagination button:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.pagination span {
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+/* reklama po stranách */
+.reklamni-obrazek {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    width: 470px;
+    background-size: cover;
+    background-position: center;
+    z-index: -1;
+}
+
+.reklamni-obrazek.left {
+    left: 0;
+    background-image: url('test.webp');
+    /* ← nahraď svou cestou nebo URL */
+}
+
+.reklamni-obrazek.right {
+    right: 0;
+    background-image: url('test1.PNG');
+    /* Takhle to má být! */
+    /* ← může být stejná nebo jiná */
+}
+
+/* Zajištění, že střed stránky není překryt */
+body {
+    margin-left: 300px;
+    margin-right: 300px;
+    background-color: #fdfdfd;
+}
+
+@media (max-width: 900px) {
+    .recipe-grid {
+        grid-template-columns: 1fr !important;
+        /* Jeden sloupec místo dvou */
+        gap: 1rem;
+    }
+
+
+    .recipe-card {
+        margin: 0 auto;
+        min-width: 0;
+    }
+
+    input,
+    textarea,
+    button {
+        font-size: 1em !important;
+    }
+}
+
+body {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.donate-section {
+    text-align: center;
+    margin-bottom: 2rem;
+    background: #fff;
+    border-radius: 1rem;
+    box-shadow: 0 4px 16px #0001;
+    padding: 1.3rem 1rem 1rem 1rem;
+    max-width: 900px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.donate-section h2 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+.donate-qrs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.2rem;
+    justify-content: center;
+    align-items: flex-end;
+}
+
+.donate-qrs div {
+    text-align: center;
+}
+
+.qr-small {
+    width: 65px;
+    height: 65px;
+    cursor: pointer;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 8px #0002;
+    transition: transform 0.18s;
+    background: #fafafa;
+}
+
+.qr-small:hover {
+    transform: scale(1.15);
+}
+
+.qr-big {
+    display: block;
+    margin: 0 auto;
+    max-width: 90vw;
+    max-height: 90vh;
+    box-shadow: 0 6px 32px #0008;
+    background: #fff;
+    border-radius: 1rem;
+}
+
+.qr-modal {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1100;
+}
+
+.qr-modal-overlay {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+}
+
+#qr-modal-img {
+    position: relative;
+    z-index: 1;
+}
+
+@media (max-width:900px) {
+    .donate-qrs {
+        gap: 0.5rem;
+    }
+
+    .qr-small {
+        width: 48px;
+        height: 48px;
+    }
+}
+
+.donate-section,
+.donate-section h2,
+.donate-section .donate-note {
+    text-align: center !important;
+}
+
+.donate-bg-img {
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+    display: block;
+    margin: 0 auto 0.5rem auto;
+    border-radius: 1.1rem;
+    object-fit: cover;
+}
+
+.donate-section {
+    max-width: 700px;
+    margin: 0 auto 1.5rem auto;
+    padding: 1.2rem 0.5rem;
+    box-sizing: border-box;
+    background: #fff;
+    border-radius: 1.1rem;
+    text-align: center;
+}
+
+@media (max-width: 700px) {
+    .donate-section {
+        padding: 0.6rem 0.1rem 0.9rem 0.1rem;
+        border-radius: 0.5rem;
+    }
+
+    .donate-bg-img {
+        max-width: 100vw;
+        border-radius: 0.7rem;
+    }
+}
+
+input,
+textarea,
+button {
+    font-size: 1em !important;
+}
+
+
+body {
+    background: #f9f9f9;
+    margin: 0;
+}
+
+main {
+    margin: 40px auto 0 auto;
+    background: #fff;
+    border-radius: 1.2rem;
+    box-shadow: 0 4px 20px #0001;
+}
+
+/* Pro PC */
+@media (min-width: 900px) {
+    main {
+        max-width: 900px;
+        padding: 1.5rem 1.5rem;
+    }
+}
+
+
+.ads-bottom {
+  margin: 2rem auto 3rem auto;
+  max-width: 950px;   /* trošku širší pro větší bannery */
+  text-align: center;
+}
+
+.ads-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3 sloupce na PC */
+  gap: 0.3rem;
+  justify-items: center;
+  align-items: center;
+}
+
+.ads-grid img {
+  width: 300px;
+  height: 150px;
+  object-fit: cover;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px #0002;
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+
+.ads-grid img:hover {
+  transform: scale(1.06);
+  box-shadow: 0 6px 20px #0003;
+}
+
+/* Responsivita – na užších displejích 2 sloupce */
+@media (max-width: 1050px) {
+  .ads-bottom { max-width: 650px; }
+  .ads-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .ads-grid img {
+    width: 270px;
+    height: 135px;
+  }
+}
+
+/* Na mobilu jeden sloupec, obrázek přes šířku */
+@media (max-width: 600px) {
+  .ads-bottom { max-width: 97vw; }
+  .ads-grid {
+    grid-template-columns: 1fr;
+    gap: 0.7rem;
+  }
+  .ads-grid img {
+    width: 95vw;
+    height: 34vw;     /* cca 300x150 poměr */
+    max-width: 360px;
+    max-height: 180px;
+  }
+}
+@media (max-width: 600px) {
+  .reklamni-obrazek.right {
+    display: none;
+  }
+}
+#login-register-container {
+  max-width: 500px;
+  margin: 2rem auto 1rem auto;
+}
+
+#login-box, #register-box {
+  background: #fff;
+  padding: 2rem 1.5rem;
+  border-radius: 1rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 16px #0001;
+}
+
+#login-box h2, #register-box h2 {
+  text-align: center;
+  font-size: 1.7rem;
+  font-weight: 700;
+  margin-bottom: 1.3rem;
+  color: #10af00;
+  letter-spacing: 1px;
+}
+
+#login-box input, #register-box input {
+  width: 100%;
+  margin: 0.5rem 0 1rem 0;
+  padding: 0.8rem 1rem;
+  font-size: 1rem;
+  border: 2px solid #1cc900;
+  border-radius: 0.7rem;
+  background: #f8f8f8;
+  outline: none;
+  transition: border 0.2s;
+}
+
+#login-box input:focus, #register-box input:focus {
+  border-color: #0e9700;
+  background: #fff;
+}
+
+#login-box button, #register-box button {
+  background: #1cc900;
+  color: #fff;
+  padding: 0.8rem 2rem;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 0.6rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: block;
+  margin: 15px auto 10px auto;
+}
+
+#login-box button:hover, #register-box button:hover {
+  background: #119a00;
+}
+
+#login-box p, #register-box p {
+  text-align: center;
+  margin-top: 1.3rem;
+}
+
+#login-box a, #register-box a {
+  color: #198b04;
+  text-decoration: underline;
+  font-weight: bold;
+}
+
+#login-msg, #register-msg {
+  text-align: center;
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+  color: #e80000;
+}
+#logout-btn {
+  display: block;
+  margin: 32px auto 18px auto;
+  background: #1cc900;
+  color: #fff;
+  padding: 0.8rem 2.1rem;
+  font-size: 1.14rem;
+  border: none;
+  border-radius: 0.6rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 3px 12px #0001;
+  transition: background 0.16s;
+  letter-spacing: 0.5px;
+}
+
+#logout-btn:hover {
+  background: #119a00;
+}
